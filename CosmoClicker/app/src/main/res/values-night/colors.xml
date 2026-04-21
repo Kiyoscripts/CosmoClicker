@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark mode adjustments -->
+    <color name="gray_100">#1E1E1E</color>
+    <color name="gray_200">#2D2D2D</color>
+    <color name="gray_300">#3C3C3C</color>
+</resources>
