@@ -1,29 +1,43 @@
-#!/bin/bash
+#!/bin/sh
 
 ##############################################################################
-# Gradle start up script for POSIX
+#
+#   Gradle start up script for UN*X
+#
 ##############################################################################
 
 # Attempt to set APP_HOME
-app_path="$0"
-while [ -h "$app_path" ]; do
-    ls_output=$(ls -ld "$app_path")
-    link=${ls_output#*' -> '}
-    case $link in
-        /*) app_path=$link ;;
-        *) app_path=${app_path%/*}/$link ;;
+# Resolve links: $0 may be a link
+app_path=$0
+
+# Need this for daisy-chained symlinks.
+while
+    APP_HOME=${app_path%"${app_path##*/}"}  # leaves a trailing /; empty if no leading path
+    [ -h "$app_path" ]
+do
+    ls=$( ls -ld "$app_path" )
+    link=${ls#*' -> '}
+    case $link in             #(
+      /*)   app_path=$link ;; #(
+      # patched on 2017-08-18 by lining
+      *)    app_path=$APP_HOME$link ;;
     esac
 done
 
-APP_HOME=$(cd "${app_path%/*}" && pwd -P) || exit
+APP_HOME=$( cd "${APP_HOME:-./}" && pwd -P ) || exit
 
-# Add default JVM options here
+APP_NAME="Gradle"
+APP_BASE_NAME=${0##*/}
+
+# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
 
-# Use the maximum available, or set MAX_FD != -1 to use that value
+# Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD=maximum
 
-warn () { echo "$*" ; } >&2
+warn () {
+    echo "$*"
+} >&2
 
 die () {
     echo
@@ -32,54 +46,102 @@ die () {
     exit 1
 } >&2
 
-# OS specific support (must be 'true' or 'false')
+# OS specific support (must be 'true' or 'false').
 cygwin=false
 msys=false
 darwin=false
 nonstop=false
-case "$(uname)" in
-    CYGWIN* ) cygwin=true ;;
-    Darwin* ) darwin=true ;;
-    MSYS* | MINGW* ) msys=true ;;
-    NONSTOP* ) nonstop=true ;;
+case "$( uname )" in                #(
+  CYGWIN* )         cygwin=true  ;; #(
+  Darwin* )         darwin=true  ;; #(
+  MSYS* | MINGW* )  msys=true    ;; #(
+  NONSTOP* )        nonstop=true ;;
 esac
 
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
-# Determine the Java command to use
-if [ -n "$JAVA_HOME" ]; then
-    if [ -x "$JAVA_HOME/jre/sh/java" ]; then
+
+# Determine the Java command to use to start the JVM.
+if [ -n "$JAVA_HOME" ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+        # IBM's JDK on AIX uses strange locations for the executables
         JAVACMD=$JAVA_HOME/jre/sh/java
     else
         JAVACMD=$JAVA_HOME/bin/java
     fi
-    if [ ! -x "$JAVACMD" ]; then
-        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME"
+    if [ ! -x "$JAVACMD" ] ; then
+        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
     fi
 else
     JAVACMD=java
-    command -v java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH."
+    if ! command -v java >/dev/null 2>&1
+    then
+        die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    fi
 fi
 
-# Increase the maximum file descriptors if we can
-if ! $cygwin && ! $darwin && ! $nonstop ; then
-    case $MAX_FD in
-        max*)
-            MAX_FD=$(ulimit -H -n) || warn "Could not query maximum file descriptor limit"
-        ;;
+# Increase the maximum file descriptors if we can.
+if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
+    case $MAX_FD in #(
+      max*)
+        # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+        MAX_FD=$( ulimit -H -n ) ||
+            warn "Could not query maximum file descriptor limit"
     esac
-    case $MAX_FD in
-        '' | soft) :;;
-        *)
-            ulimit -n "$MAX_FD" || warn "Could not set maximum file descriptor limit to $MAX_FD"
-        ;;
+    case $MAX_FD in  #(
+      '' | soft) :;; #(
+      *)
+        # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+        ulimit -n "$MAX_FD" ||
+            warn "Could not set maximum file descriptor limit: $MAX_FD"
     esac
 fi
 
-# Collect all options for the process
-eval set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS
+# Collect all arguments for the java command;
+#   * $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $GRADLE_OPTS can contain fragments of
+#     shell script including quotes and variable substitutions, so put them in
+#     double quotes to make sure that they get re-expanded; and
+#   * put everything else in single quotes, so that it's not re-expanded.
 
-exec "$JAVACMD" \
-    -classpath "$CLASSPATH" \
-    org.gradle.wrapper.GradleWrapperMain \
-    "$@"
+set -- \
+        "-Dorg.gradle.appname=$APP_BASE_NAME" \
+        -classpath "$CLASSPATH" \
+        org.gradle.wrapper.GradleWrapperMain \
+        "$@"
+
+# Stop when "xargs" is not available.
+if ! command -v xargs >/dev/null 2>&1
+then
+    die "xargs is not available"
+fi
+
+# Use "xargs" to parse quoted args.
+#
+# With -n1 it outputs one arg per line, with the quotes and backslashes removed.
+#
+# In Bash we could simply go:
+#
+#   readarray ARGS < <( xargs -n1 <<<"$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" )
+#   set -- "${ARGS[@]}" "$@"
+#
+# but POSIX shell has neither arrays nor command substitution, so instead we
+# use a file descriptor here as a sort of array, and then append the JVM
+# options to the "set" command.
+#
+# We also use "set" to clear the positional parameters in case xargs fails.
+eval "set -- $(
+        printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
+        xargs -n1 |
+        sed ' s~[^a-zA-Z0-9/=@._-]~\\&~g; ' |
+        tr '\n' ' '
+    ) $@"
+
+exec "$JAVACMD" "$@"
