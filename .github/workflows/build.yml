@@ -30,6 +30,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build debug APK
+        env:
+          JAVA_TOOL_OPTIONS: ""
         run: ./gradlew assembleDebug --info --stacktrace
 
       - name: Upload APK
@@ -63,6 +65,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build release APK
+        env:
+          JAVA_TOOL_OPTIONS: ""
         run: ./gradlew assembleRelease --info --stacktrace
 
       - name: Upload Release APK
